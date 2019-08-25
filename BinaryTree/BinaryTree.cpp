@@ -29,43 +29,77 @@ void add_node(tree_s *&node, int val)
 	}
 }
 
-void print_Tree(tree_s *&p, int level)
+void visual_tree(tree_s *&p, int level)
 {
 	if (p)
 	{
-		print_Tree(p->right, level + 1);
+		visual_tree(p->right, level + 1);
 		for (int i = 0; i < level; i++) std::cout << "   ";
 		std::cout << p->value << std::endl;
-		print_Tree(p->left, level + 1);		
+		visual_tree(p->left, level + 1);		
 	}
 }
 
-void show_tree(tree_s *&node)
+void print_tree(tree_s *&node)
 {
 	if (node != nullptr) {
 		
-		show_tree(node->left);
+		print_tree(node->left);
 		std::cout << " " << node->value;
-		show_tree(node->right);
+		print_tree(node->right);
 	}
+}
+
+tree_s* find_node(tree_s *&node, int value)
+{	
+	if (!node) {
+		return nullptr;
+	}
+	int tmp = node->value;
+	
+	if (tmp == value) {
+		return node;
+	} else if (tmp < value) {
+		return find_node(node->right, value);
+	} else {
+		return find_node(node->left, value);
+	}
+
+	return node;
+}
+
+void free_tree(tree_s* node)
+{
+	if (node->left) {
+		free_tree(node->left);
+	}
+
+	if (node->right) {
+		free_tree(node->right);
+	}
+
+	std::cout << " " << node->value;
+	delete node;
 }
 
 int main()
 {
 	tree_s *object1 = new binary_tree(nullptr, nullptr, 5);
 
-	add_node(object1, 3);
-	add_node(object1, -1);
-	add_node(object1, 7);
-	add_node(object1, 4);
-	add_node(object1, 1);
-	add_node(object1, 30);
+	add_node(object1, 3); add_node(object1, -1);
+	add_node(object1, 7); add_node(object1, 4);
+	add_node(object1, 1); add_node(object1, 30);
 
 	for (int i = 0; i < 10; i++) {
 		add_node(object1, i);
 	}
 
-	print_Tree(object1, 1);
+	tree_s* obj = find_node(object1, 300);
+	if (obj) {
+		std::cout << obj->value << " kek !!\n\n";
+	}
 
-    //std::cout << object1->value;
+	visual_tree(object1, 1);
+
+	free_tree(object1);
 }
