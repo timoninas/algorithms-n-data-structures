@@ -2,7 +2,7 @@
 
 int main()
 {
-	tree_s* object1 = new binary_tree(nullptr, nullptr, 5);
+	/*tree_s* object1 = new binary_tree(nullptr, nullptr, 5);
 
 	add_node(object1, 3); add_node(object1, -1);
 	add_node(object1, 7); add_node(object1, 4);
@@ -19,5 +19,29 @@ int main()
 
 	visual_tree(object1, 1);
 
-	free_tree(object1);
+	free_tree(object1);*/
+	int action = 0;
+
+	while (action != -1) {
+
+		actions_binarytree();
+
+		std::cout << " Input action: ";
+		std::cin >> action;
+
+		switch (action) {
+
+		case 0: 
+			continue;
+			break;
+
+		case -1:
+			break;
+
+		default:
+			std::cout << "\n Incorrect input!\n";
+		}
+	}
+
+	std::cout << "\n Programm succesfully completed!\n";
 }

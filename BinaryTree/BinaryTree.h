@@ -20,3 +20,5 @@ void visual_tree(tree_s*& p, int level);
 void print_tree(tree_s*& node);
 tree_s* find_node(tree_s*& node, int value);
 void free_tree(tree_s* node);
+
+void actions_binarytree();
