@@ -20,6 +20,7 @@ int main()
 	visual_tree(object1, 1);
 
 	free_tree(object1);*/
+	tree_s* object1 = nullptr;
 	int action = 0;
 
 	while (action != -1) {
@@ -33,6 +34,45 @@ int main()
 
 		case 0: 
 			continue;
+			break;
+
+		case 1:
+			int value;
+
+			std::cout << " Input number: ";
+			std::cin >> value;
+
+			if (!object1) {
+				object1 = new binary_tree(nullptr, nullptr, value);
+				std::cout << " Initilized and added\n";
+			}
+			else {
+				add_node(object1, value);
+				std::cout << " Added\n";
+			}
+
+			
+
+			break;
+			
+		case 4:
+			if (!object1) {
+				std::cout << " \nBinary tree is absent\n";
+			}
+			else {
+				visual_tree(object1, 0);
+			}
+			
+			break;
+
+		case 5:
+			print_tree(object1);
+			break;
+
+		case 6:
+			free_tree(object1);
+			object1 = nullptr;
+
 			break;
 
 		case -1:

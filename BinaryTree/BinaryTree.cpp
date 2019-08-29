@@ -18,7 +18,7 @@ void add_node(tree_s *&node, int val)
 
 void visual_tree(tree_s *&p, int level)
 {
-	if (p)
+	if (p != nullptr)
 	{
 		visual_tree(p->right, level + 1);
 		for (int i = 0; i < level; i++) std::cout << "   ";
