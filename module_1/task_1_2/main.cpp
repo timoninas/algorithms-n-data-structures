@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <istream>
 #include <sstream>
+#include <cmath>
 
 /*
    Вычислить  площадь  выпуклого  n-угольника,  заданного
@@ -112,8 +113,8 @@ int run(std::istream& input, std::ostream& output) {
 }
 
 int main(int argc, const char * argv[]) {
-//    testLogic();
-//    std::cout << "OK" << std::endl;
+    testLogic();
+    std::cout << "OK" << std::endl;
     return run(std::cin, std::cout);
 }
 
