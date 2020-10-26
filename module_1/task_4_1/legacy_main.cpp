@@ -4,7 +4,7 @@
 template <class T>
 class LilArray {
 public:
-    LilArray(): buf(0), currentSize(0), maxSize(0) { }
+    LilArray(): buf(nullptr), currentSize(0), maxSize(4) { buf = new T[maxSize]; }
     LilArray(T* array, int size);
     //~LilArray() { delete [] buf; }
     
@@ -27,26 +27,10 @@ private:
     T* buf;
     int currentSize;
     int maxSize;
-    int defaultSize = 1;
     
     bool is_full() { return currentSize == maxSize; }
     void grow();
 };
-
-template <typename T>
-LilArray<T>::LilArray(T* array, int size) {
-    currentSize = 0;
-    maxSize = 4;
-    while(maxSize < size) {
-        maxSize *= 2;
-    }
-    
-    buf = new T[maxSize];
-    
-    for (int i = 0; i < size; i++) {
-        buf[currentSize++] = array[i];
-    }
-}
 
 template <typename T>
 void LilArray<T>::swipe(const int &index1, const int &index2) {
@@ -86,6 +70,21 @@ void LilArray<T>::pop() {
 }
 
 template <typename T>
+LilArray<T>::LilArray(T* array, int size) {
+    currentSize = 0;
+    maxSize = 4;
+    while(maxSize < size) {
+        maxSize *= 2;
+    }
+    
+    buf = new T[maxSize];
+    
+    for (int i = 0; i < size; i++) {
+        buf[currentSize++] = array[i];
+    }
+}
+
+template <typename T>
 void LilArray<T>::print() {
     if (!is_empty()) {
         std::cout << "LilArray" << std::endl;
@@ -116,8 +115,7 @@ void LilArray<T>::push_back(T val) {
 
 template <typename T>
 void LilArray<T>::grow() {
-    int newBufferSize = std::max(maxSize * 2, defaultSize);
-    T* tmp_arr = new T[newBufferSize];
+    T* tmp_arr = new T[maxSize * 2];
     
     for (int i = 0; i < currentSize; i++) {
         tmp_arr[i] = buf[i];
@@ -125,7 +123,7 @@ void LilArray<T>::grow() {
     
     delete [] buf;
     
-    maxSize = newBufferSize;
+    maxSize *= 2;
     buf = tmp_arr;
 }
 
@@ -234,6 +232,7 @@ template <typename T, typename Comparator>
 void Heap<T, Comparator>::extract_top() {
     assert(!is_empty());
     
+    T last = buf->last();
     int last_index = count()-1;
     buf->swipe(0, last_index);
     buf->pop();
@@ -247,8 +246,24 @@ void Heap<T, Comparator>::pop() {
     buf->pop();
 }
 
-int cormorant(Heap<int> * heap, int weight) {
-    int *tmp_arr = new int[heap->count()];
+int run(std::istream& input, std::ostream& output) {
+    int size;
+    input >> size;
+    
+    assert(size > 0);
+    
+    Heap<int> * heap = new Heap<int>();
+    
+    for (int i = 0; i < size; i++) {
+        int num;
+        input >> num;
+        heap->push(num);
+    }
+    
+    int weight;
+    input >> weight;
+    
+    int *tmp_arr = new int[size];
     int current_size = 0;
     
     assert(heap->top() <= weight);
@@ -277,31 +292,13 @@ int cormorant(Heap<int> * heap, int weight) {
     
     free(tmp_arr);
     delete heap;
-    return iterations;
-}
-
-int run(std::istream& input, std::ostream& output) {
-    int size;
-    input >> size;
     
-    assert(size > 0);
-    
-    Heap<int> * heap = new Heap<int>();
-    
-    for (int i = 0; i < size; i++) {
-        int num;
-        input >> num;
-        heap->push(num);
-    }
-    
-    int weight;
-    input >> weight;
-    
-    output << cormorant(heap, weight) << "\n";
+    output << iterations << "\n";
     
     return 0;
 }
 
 int main(int argc, const char * argv[]) {
+    
     return run(std::cin, std::cout);;
 }
