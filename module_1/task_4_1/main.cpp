@@ -303,5 +303,5 @@ int run(std::istream& input, std::ostream& output) {
 }
 
 int main(int argc, const char * argv[]) {
-    return run(std::cin, std::cout);;
+    return run(std::cin, std::cout);
 }
