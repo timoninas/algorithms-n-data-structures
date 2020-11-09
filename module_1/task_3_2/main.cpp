@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 
 template <class T>
 T foo(T e) {
@@ -143,17 +144,64 @@ T DEQ<T>::pop_back() {
     return array[back];
 }
 
-int main(int argc, const char * argv[]) {
-    
+// push front - 1 num
+// pop front  - 2 [ret num] if num == ret -> YES
+// push back  - 3 num
+// pop back   - 4 [ret num] if num != ret -> NO
+
+int run(std::istream& input, std::ostream& output) {
     DEQ<int> *que = new DEQ<int>();
     
-    que->push_front(1);
-    que->push_front(2);
-    que->push_front(3);
-    que->push_back(9);
-    que->push_front(4);
-    que->push_front(5);
-    que->push_front(6);
+    int num = 0;
+    input >> num;
     
+    for (int i = 0; i < num; i++) {
+        int command = 0;
+        int command_value = -1;
+        int que_value = -1;
+        input >> command >> command_value;
+        
+        switch (command) {
+            case 1:
+                que->push_front(command_value);
+                break;
+            case 2:
+                if (!que->is_empty()) {
+                    que_value = que->pop_front();
+                } else if (que->is_empty()) {
+                    que_value = -1;
+                }
+                
+                if (command_value != que_value) {
+                    output << "NO" << "\n";
+                    return 0;
+                }
+                break;
+            case 3:
+                que->push_back(command_value);
+                break;
+            case 4:
+                if (!que->is_empty()) {
+                    que_value = que->pop_back();
+                } else if (que->is_empty()) {
+                    que_value = -1;
+                }
+                
+                if (command_value != que_value) {
+                    output << "NO" << "\n";
+                    return 0;
+                }
+                break;
+            default:
+                output << "NO" << "\n";
+                return 0;
+        }
+    }
+    output << "YES" << "\n";
     return 0;
+}
+
+int main(int argc, const char * argv[]) {
+    
+    return run(std::cin, std::cout);
 }
