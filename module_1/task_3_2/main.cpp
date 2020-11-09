@@ -1,5 +1,9 @@
 #include <iostream>
 #include <assert.h>
+#include <istream>
+#include <sstream>
+
+int run(std::istream& input, std::ostream& output);
 
 template <class T>
 T foo(T e) {
@@ -137,7 +141,7 @@ T DEQ<T>::pop_back() {
     size--;
     back--;
     
-    if (back == 0) {
+    if (back == -1) {
         back = buffer_size - 1;
     }
     
@@ -148,6 +152,73 @@ T DEQ<T>::pop_back() {
 // pop front  - 2 [ret num] if num == ret -> YES
 // push back  - 3 num
 // pop back   - 4 [ret num] if num != ret -> NO
+
+void testLogic() {
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "1 2" << std::endl;
+        sstr_input << "4 2" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "1 2" << std::endl;
+        sstr_input << "2 2" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "3 2" << std::endl;
+        sstr_input << "2 2" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "3 2" << std::endl;
+        sstr_input << "4 2" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "3" << std::endl;
+        sstr_input << "1 44" << std::endl;
+        sstr_input << "3 50" << std::endl;
+        sstr_input << "2 44" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "2 -1" << std::endl;
+        sstr_input << "1 10" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "YES\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "2" << std::endl;
+        sstr_input << "3 44" << std::endl;
+        sstr_input << "4 66" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "NO\n");
+    }
+}
 
 int run(std::istream& input, std::ostream& output) {
     DEQ<int> *que = new DEQ<int>();
@@ -202,6 +273,7 @@ int run(std::istream& input, std::ostream& output) {
 }
 
 int main(int argc, const char * argv[]) {
-    
+    testLogic();
+    std::cout << "TEST PASSED\n" << std::endl;
     return run(std::cin, std::cout);
 }
