@@ -22,4 +22,9 @@ ____
 
 ### Модуль 2
 
+| :1234: | Описание | Код |
+| --- | --- | --- |
+| :one: | Хеш-таблица с двойным хешированием | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_2/task_1_2/main.cpp) |
+| :two: | Бинарное дерево. Вывод элементов в порядке in-order | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_2/task_2_1/main.cpp) |
+
 ### Рубежный контроль 2
