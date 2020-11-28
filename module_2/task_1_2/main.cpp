@@ -1,17 +1,18 @@
+#include <iostream>
 #include <istream>
 #include <sstream>
-#include <iostream>
 
+#include <assert.h>
 #include <string>
 #include <vector>
-#include <assert.h>
 
-#define NUM1 79
-#define NUM2 101
-#define NUM3 857
+#define INIT_SIZE 8
 
-using std::string;
+#define PRIME_NUM1 79
+#define PRIME_NUM2 101
 
+
+// MARK:- HashFunc
 template<class T> struct HashFunc;
 
 template<> struct HashFunc<int> {
@@ -31,10 +32,7 @@ template<> struct HashFunc<std::string> {
     }
 };
 
-static constexpr size_t BUCKETS_COUNT[] = {
-        7, 17, 37, 73, 149, 251, 509, 1021, 2027, 5003, 10837, 22073, 100003, 1000000
-};
-
+// MARK:- Node
 template <class Key, class Value>
 struct Node {
     Key key;
@@ -58,11 +56,13 @@ struct Node {
     }
 };
 
+// MARK:- HashTable
 template <class Key, class Value, class Hash = HashFunc<Key>>
 class HashTable {
 public:
+    // MARK: Public Methods
     explicit HashTable(Hash hash = Hash()): buckets(0), items_count(0), hash(hash) {
-        buckets_count = 11;
+        buckets_count = INIT_SIZE;
         for (int i = 0; i < buckets_count; i++) {
             buckets.push_back(Node<Key, Value>());
         }
@@ -73,7 +73,6 @@ public:
     }
 
     bool insert(const Key& key, const Value& value) {
-//        std::cout << 3 * buckets_count << " < " << 4 * items_count << std::endl;
         if (!buckets.size() || (3 * buckets_count) <  (4 * items_count)) {
             grow();
         }
@@ -89,10 +88,6 @@ public:
                 break;
             }
         }
-        
-//        std::cout << "\ninsert key = " << key << "; value = " << value << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
-//        print();
         return true;
     }
 
@@ -107,12 +102,6 @@ public:
             }
         }
         return false;
-    }
-    
-    void print() {
-        for (int i = 0; i < buckets.size(); i++) {
-            std::cout << i << " - " << buckets[i].key << std::endl;
-        }
     }
 
     bool remove(const Key& key) {
@@ -131,20 +120,19 @@ public:
     }
 
 private:
+    // MARK: Properties
     std::vector<Node<Key, Value>> buckets;
     size_t buckets_count;
     size_t items_count;
 
     Hash hash;
 
+    // MARK: Private Methods
     void grow() {
         std::vector<Node<Key, Value>> old_buckets = buckets;
         buckets_count *= 2;
         buckets = std::vector<Node<Key, Value>>(0);
         items_count = 0;
-        
-//        std::cout << "buckets_count = " << buckets_count << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
         
         for (int i = 0; i < buckets_count; i++) {
             buckets.push_back(Node<Key, Value>());
@@ -155,22 +143,18 @@ private:
                 insert(old_buckets[i].key, old_buckets[i].value);
             }
         }
-        
-//        std::cout << std::endl;
-//        std::cout << "buckets_count = " << buckets_count << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
     }
 
     size_t hash_double(const Key& key, int iteration) {
         size_t size = buckets_count;
-        size_t hash_value1 = hash(key, NUM1);
-        size_t hash_value2 = 2 * hash(key, NUM2) + 1;
+        size_t hash_value1 = hash(key, PRIME_NUM1);
+        size_t hash_value2 = 2 * hash(key, PRIME_NUM2) + 1;
         return (hash_value1 + hash_value2 * iteration) % size;
     }
 };
 
 int run(std::istream& input, std::ostream& output) {
-    HashTable<string, string> hash;
+    HashTable<std::string, std::string> hash;
     
     char operation;
     std::string key;
@@ -197,8 +181,6 @@ int run(std::istream& input, std::ostream& output) {
             }
         }
     
-//    hash.print();
-    
     return 0;
 }
 
@@ -218,8 +200,6 @@ void testLogic() {
         }
         std::stringstream sstr_output;
         run(sstr_input, sstr_output);
-//        assert(sstr_output.str() == "1\n");
-//        std::cout << sstr_output.str() << std::endl;
     }
     {
         std::stringstream sstr_input;
