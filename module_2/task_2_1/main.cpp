@@ -1,310 +1,172 @@
+#include <iostream>
+#include <stack>
 #include <istream>
 #include <sstream>
-#include <iostream>
 
-#include <string>
-#include <vector>
-#include <assert.h>
 
-#define NUM1 79
-#define NUM2 101
-#define NUM3 857
-
-using std::string;
-
-template<class T> struct HashFunc;
-
-template<> struct HashFunc<int> {
-    size_t operator() (const int& key, const int& simpleNum) {
-        return key;
+template <class T>
+struct DefaultComparator {
+    bool operator() (const T& l, const T& r) const {
+        return l < r;
     }
 };
 
-template<> struct HashFunc<std::string> {
-    size_t operator() (const std::string& key, const int& simpleNum) {
-        size_t hash = 0;
-        int a = simpleNum;
-        for(int i = 0; i < key.size(); i++) {
-            hash = (hash * a + key[i]);
+template<> struct DefaultComparator<std::string> {
+    bool operator() (const std::string& l, const std::string& r) const {
+        int left = 0;
+        int right = 0;
+        for (int i = 0; i < l.size(); i++) {
+            left += l[i];
         }
-        return hash;
+        for (int i = 0; i < r.size(); i++) {
+            right += r[i];
+        }
+        return l < r;
     }
 };
 
-static constexpr size_t BUCKETS_COUNT[] = {
-        7, 17, 37, 73, 149, 251, 509, 1021, 2027, 5003, 10837, 22073, 100003, 1000000
-};
-
-template <class Key, class Value>
+template<class T>
 struct Node {
-    Key key;
-    Value value;
-
-    // -1 - deleted
-    //  0 - free
-    //  1 - not free
-    int status;
-
-    void set(const Key& key, const Value& value, int status) {
-        this->key = key;
-        this->value = value;
-        this->status = status;
-    }
+    T value;
     
-    Node() {
-        key = "";
-        value = "";
-        status = 0;
-    }
+    Node* left;
+    Node* right;
+    
+    Node(T value): value(value), left(nullptr), right(nullptr) { }
 };
 
-template <class Key, class Value, class Hash = HashFunc<Key>>
-class HashTable {
+template<class T, class Comparator = DefaultComparator<T>>
+class BinaryTree {
+    
 public:
-    explicit HashTable(Hash hash = Hash()): buckets(0), items_count(0), hash(hash) {
-        buckets_count = 8;
-        for (int i = 0; i < buckets_count; i++) {
-            buckets.push_back(Node<Key, Value>());
+    BinaryTree(Comparator comparator = DefaultComparator<T>()): root(nullptr) { }
+    
+    ~BinaryTree() {
+        std::stack<Node<T>*> stack;
+        if (root) {
+            stack.push(root);
+        }
+        
+        root = nullptr;
+        
+        while(!stack.empty()) {
+            Node<T>* poped = stack.top();
+            stack.pop();
+            
+            if (poped->left != nullptr) {
+                stack.push(poped->left);
+            }
+            if (poped->right != nullptr) {
+                stack.push(poped->right);
+            }
+            delete poped;
         }
     }
     
-    ~HashTable() {
-        buckets.clear();
-    }
-
-    bool insert(const Key& key, const Value& value) {
-//        std::cout << 3 * buckets_count << " < " << 4 * items_count << std::endl;
-        if (!buckets.size() || (3 * buckets_count) <  (4 * items_count)) {
-            grow();
+    void add(const T& value) {
+        if (!root) {
+            root = new Node<T>(value);
+            return;
         }
         
-        for (int i = 0; i < buckets.size(); i++) {
-            size_t index = hash_double(key, i);
-            
-            if (buckets[index].status == 1 && buckets[index].key == key) {
-                return false;
-            } else if (buckets[index].status != 1) {
-                buckets[index].set(key, value, 1);
-                items_count++;
-                break;
+        Node<T>* current = root;
+        while(current) {
+            if (current->value <= value) {
+                if (current->right == nullptr) {
+                    current->right = new Node<T>(value);
+                    break;
+                } else {
+                    current = current->right;
+                }
+            } else {
+                if (current->left == nullptr) {
+                    current->left = new Node<T>(value);
+                    break;
+                } else {
+                    current = current->left;
+                }
             }
         }
-        
-//        std::cout << "\ninsert key = " << key << "; value = " << value << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
-//        print();
-        return true;
-    }
-
-    bool find(const Key& key) {
-        for (int i = 0; i < buckets.size(); i++) {
-            size_t index = hash_double(key, i);
-            
-            if (buckets[index].status == 1 && buckets[index].key == key) {
-                return true;
-            } else if (buckets[index].status == 0) {
-                return false;
-            }
-        }
-        return false;
     }
     
-    void print() {
-        for (int i = 0; i < buckets.size(); i++) {
-            std::cout << i << " - " << buckets[i].key << std::endl;
-        }
-    }
-
-    bool remove(const Key& key) {
-        for (int i = 0; i < buckets.size(); i++) {
-            size_t index = hash_double(key, i);
+    void in_order(void(*cb)(Node<T>*)) {
+        if (!root) return;
+        
+        std::stack<Node<T>*> stack;
+        stack.push(root);
+        bool onlyLeft = true;
+        
+        while(!stack.empty()) {
+            Node<T>* poped = stack.top();
             
-            if (buckets[index].status == 1 && buckets[index].key == key) {
-                buckets[index].status = -1;
-                items_count--;
-                return true;
-            } else if (buckets[index].status == 0) {
-                return false;
+            if (onlyLeft) {
+                if (poped->left == nullptr) {
+                    onlyLeft = false;
+                } else {
+                    stack.push(poped->left);
+                }
+            } else {
+                stack.pop();
+                std::cout << poped->value << " ";
+                if (poped->right != nullptr) {
+                    stack.push(poped->right);
+                    onlyLeft = true;
+                }
             }
         }
-        return false;
+        
+        std::cout << std::endl;
     }
-
+    
 private:
-    std::vector<Node<Key, Value>> buckets;
-    size_t buckets_count;
-    size_t items_count;
-
-    Hash hash;
-
-    void grow() {
-        std::vector<Node<Key, Value>> old_buckets = buckets;
-        buckets_count *= 2;
-        buckets = std::vector<Node<Key, Value>>(0);
-        items_count = 0;
-        
-//        std::cout << "buckets_count = " << buckets_count << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
-        
-        for (int i = 0; i < buckets_count; i++) {
-            buckets.push_back(Node<Key, Value>());
-        }
-        
-        for (int i = 0; i < old_buckets.size(); i++) {
-            if (old_buckets[i].status == 1) {
-                insert(old_buckets[i].key, old_buckets[i].value);
-            }
-        }
-        
-//        std::cout << std::endl;
-//        std::cout << "buckets_count = " << buckets_count << std::endl;
-//        std::cout << "items_count = " << items_count << std::endl;
-    }
-
-    size_t hash_double(const Key& key, int iteration) {
-        size_t size = buckets_count;
-        size_t hash_value1 = hash(key, NUM1);
-        size_t hash_value2 = 2 * hash(key, NUM2) + 1;
-        return (hash_value1 + hash_value2 * iteration) % size;
-    }
+    Node<T>* root;
 };
+
+void print_node_value(Node<int>* node) {
+    std::cout << node->value << " ";
+}
 
 int run(std::istream& input, std::ostream& output) {
-    HashTable<string, string> hash;
+    int size = 0;
+    input >> size;
     
-    char operation;
-    std::string key;
+    BinaryTree<int> tree;
     
-    while (input >> operation >> key) {
-            bool res = false;
-            switch (operation) {
-                case '+':
-                    res = hash.insert(key, key);
-                    break;
-                case '-':
-                    res = hash.remove(key);
-                    break;
-                case '?':
-                    res = hash.find(key);
-                    break;
-                default:
-                    return 1;
-            }
-            if (res) {
-                output << "OK" << std::endl;
-            } else {
-                output << "FAIL" << std::endl;
-            }
-        }
+    for (int i = 0; i < size; i++) {
+        int number = 0;
+        input >> number;
+        
+        tree.add(number);
+    }
     
-//    hash.print();
+    tree.in_order(print_node_value);
     
     return 0;
 }
 
-void testLogic() {
-    {
-        std::stringstream sstr_input;
-        std::string operation = "+";
-        for (int i = 0; i < 10000; i++) {
-            sstr_input << operation << " "<< std::to_string(i) << std::endl;
-        }
-
-        operation = "-";
-        for (int i = 0; i < 10000; i++) {
-            sstr_input << "?" << " " << std::to_string(i) << std::endl;
-            sstr_input << operation << " "<< std::to_string(i) << std::endl;
-            sstr_input << "?" << " " << std::to_string(i) << std::endl;
-        }
-        std::stringstream sstr_output;
-        run(sstr_input, sstr_output);
-//        assert(sstr_output.str() == "1\n");
-//        std::cout << sstr_output.str() << std::endl;
-    }
-    {
-        std::stringstream sstr_input;
-        for (int i = 0; i < 2; i++) {
-            sstr_input << "?" << " "<< std::to_string(i) << std::endl;
-            sstr_input << "+" << " "<< std::to_string(i) << std::endl;
-            sstr_input << "?" << " "<< std::to_string(i) << std::endl;
-        }
-
-        for (int i = 0; i < 2; i++) {
-            sstr_input << "-" << " "<< std::to_string(i) << std::endl;
-            sstr_input << "?" << " "<< std::to_string(i) << std::endl;
-
-        }
-        std::stringstream sstr_output;
-        run(sstr_input, sstr_output);
-        assert(sstr_output.str() == "FAIL\nOK\nOK\nFAIL\nOK\nOK\nOK\nFAIL\nOK\nFAIL\n");
-        std::cout << sstr_output.str() << std::endl;
-    }
-    {
-        std::stringstream sstr_input;
-        sstr_input << "?" << " " << "123" << std::endl;
-        sstr_input << "+" << " " << "123" << std::endl;
-        sstr_input << "+" << " " << "123" << std::endl;
-        sstr_input << "?" << " " << "123" << std::endl;
-        sstr_input << "-" << " " << "123" << std::endl;
-        sstr_input << "?" << " " << "123" << std::endl;
-        std::stringstream sstr_output;
-        run(sstr_input, sstr_output);
-        assert(sstr_output.str() == "FAIL\nOK\nFAIL\nOK\nOK\nFAIL\n");
-        std::cout << sstr_output.str() << std::endl;
-    }
-    {
-        std::stringstream sstr_input;
-        sstr_input << "+" << " " << "a" << std::endl;
-        sstr_input << "+" << " " << "ab" << std::endl;
-        sstr_input << "+" << " " << "abc" << std::endl;
-        sstr_input << "+" << " " << "abc1" << std::endl;
-        sstr_input << "+" << " " << "abc2" << std::endl;
-
-        sstr_input << "-" << " " << "a" << std::endl;
-
-        sstr_input << "+" << " " << "abcd" << std::endl;
-
-        sstr_input << "-" << " " << "ab" << std::endl;
-
-        sstr_input << "+" << " " << "abcde" << std::endl;
-        sstr_input << "+" << " " << "abcdef" << std::endl;
-
-        sstr_input << "?" << " " << "a" << std::endl;
-        sstr_input << "+" << " " << "a" << std::endl;
-        sstr_input << "?" << " " << "a" << std::endl;
-        sstr_input << "+" << " " << "a" << std::endl;
-
-        std::stringstream sstr_output;
-        run(sstr_input, sstr_output);
-        std::cout << sstr_output.str() << std::endl;
-        assert(sstr_output.str() == "OK\nOK\nOK\nOK\nOK\nOK\nOK\nOK\nOK\nOK\nFAIL\nOK\nOK\nFAIL\n");
-        std::cout << sstr_output.str() << std::endl;
-    }
-    {
-        std::stringstream sstr_input;
-
-        sstr_input << "+" << " " << "%%%%%%" << std::endl;
-        sstr_input << "+" << " " << "JJJ" << std::endl;
-        sstr_input << "+" << " " << "%%JJ" << std::endl;
-        sstr_input << "+" << " " << "J%%J" << std::endl;
-        sstr_input << "?" << " " << "J%%J" << std::endl;
-        sstr_input << "+" << " " << "JJ%%" << std::endl;
-        sstr_input << "+" << " " << "J%%%%" << std::endl;
-        sstr_input << "+" << " " << "%%%%J" << std::endl;
-
-        std::stringstream sstr_output;
-        run(sstr_input, sstr_output);
-        std::cout << sstr_output.str() << std::endl;
-        assert(sstr_output.str() == "OK\nOK\nOK\nOK\nOK\nOK\nOK\nOK\n");
-        std::cout << sstr_output.str() << std::endl;
-    }
-}
-
+// Выведите элементы в порядке in-order (слева направо)
 int main(int argc, const char * argv[]) {
-//    testLogic();
-//    std::cout << "TEST PASSED" << std::endl;
-//    return 0;
+    //       5
+    //    2     6
+    //  1   3
+            
+    // in-order -> 1 2 3 5 6
     
     return run(std::cin, std::cout);
 }
 
+// Input
+// 10
+// 9
+// 10
+// 4
+// 3
+// 2
+// 7
+// 8
+// 5
+// 1
+// 6
+
+// Output
+// 1 2 3 4 5 6 7 8 9 10
