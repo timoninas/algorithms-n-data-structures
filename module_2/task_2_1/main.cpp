@@ -89,7 +89,7 @@ public:
         }
     }
     
-    void in_order(void(*cb)(Node<T>*)) {
+    void in_order(void(*callback)(Node<T>*)) {
         if (!root) return;
         
         std::stack<Node<T>*> stack;
@@ -107,15 +107,13 @@ public:
                 }
             } else {
                 stack.pop();
-                std::cout << poped->value << " ";
+                callback(poped);
                 if (poped->right != nullptr) {
                     stack.push(poped->right);
                     onlyLeft = true;
                 }
             }
         }
-        
-        std::cout << std::endl;
     }
     
 private:
@@ -140,6 +138,7 @@ int run(std::istream& input, std::ostream& output) {
     }
     
     tree.in_order(print_node_value);
+    std::cout << std::endl;
     
     return 0;
 }
