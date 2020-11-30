@@ -6,10 +6,8 @@
 #include <string>
 #include <vector>
 
-#define INIT_SIZE 8
-
-#define PRIME_NUM1 79
-#define PRIME_NUM2 101
+#define PRIME_NUM1 13
+#define PRIME_NUM2 17
 
 
 // MARK:- HashFunc
@@ -61,11 +59,7 @@ template <class Key, class Value, class Hash = HashFunc<Key>>
 class HashTable {
 public:
     // MARK: Public Methods
-    explicit HashTable(Hash hash = Hash()): buckets(0), items_count(0), hash(hash) {
-        buckets_count = INIT_SIZE;
-        for (int i = 0; i < buckets_count; i++) {
-            buckets.push_back(Node<Key, Value>());
-        }
+    explicit HashTable(Hash hash = Hash()): buckets(0), buckets_count(0), items_count(0), hash(hash) {
     }
     
     ~HashTable() {
@@ -77,18 +71,29 @@ public:
             grow();
         }
         
+        size_t first_deleted = -1;
+        
         for (int i = 0; i < buckets.size(); i++) {
             size_t index = hash_double(key, i);
             
             if (buckets[index].status == 1 && buckets[index].key == key) {
                 return false;
-            } else if (buckets[index].status != 1) {
+            } else if (buckets[index].status == 0 && first_deleted == -1) {
                 buckets[index].set(key, value, 1);
                 items_count++;
-                break;
+                return true;
+            } else if (buckets[index].status == -1 && first_deleted == -1) {
+                first_deleted = index;
             }
         }
-        return true;
+        
+        if (first_deleted != -1) {
+            buckets[first_deleted].set(key, value, 1);
+            items_count++;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool find(const Key& key) {
@@ -129,8 +134,8 @@ private:
 
     // MARK: Private Methods
     void grow() {
+        buckets_count = std::max(size_t(1), buckets_count * 2);
         std::vector<Node<Key, Value>> old_buckets = buckets;
-        buckets_count *= 2;
         buckets = std::vector<Node<Key, Value>>(0);
         items_count = 0;
         
