@@ -176,18 +176,63 @@ private:
                 return left;
             }
             
-            //            Node* min_node = find_and_remove_min(right);
-            //            min_node->right = right;
-            //            min_node->left = left;
+            if (!right->left && !right->right) {
+                right->left = left;
+                return balance(right);
+            }
             
-            Node* min_node = find_min(right);
-            min_node->right = remove_min(right);
+            Node* min_node = find_and_remove_min(right);
+            min_node->right = right;
             min_node->left = left;
+            
+//            Node* min_node = find_min(right);
+//            min_node->right = remove_min(right);
+//            min_node->left = left;
             
             return balance(min_node);
         }
         
         return balance(node);
+    }
+    
+    Node* find_and_remove_min(Node* node) {
+        Node* minNode = node;
+        while(minNode->left) {
+            minNode = minNode->left;
+        }
+        
+        Node* finded_min = minNode; // 5
+        
+        Node* prev = node;
+        minNode = node->left;
+        
+        if (minNode) {
+            while(minNode->left) {
+                prev = minNode;
+                balance(minNode);
+                minNode = minNode->left;
+                
+            }
+        }
+        
+        
+        if (minNode && minNode->right) {
+            prev->left = minNode->right;
+            finded_min->right = node;
+        }
+        
+        if (minNode && minNode->right == nullptr) {
+            prev->left = nullptr;
+            finded_min->right = node;
+        }
+//        if (!minNode) {
+//            finded_min->right = nullptr;
+//        }
+//        finded_min->left = node->left;
+        
+//        finded_min->right = minNode->right;
+        
+        return finded_min;
     }
     
     Node* find_min(Node* node) {
@@ -203,29 +248,6 @@ private:
         }
         node->left = remove_min(node->left);
         return balance(node);
-    }
-    
-    Node* find_and_remove_min(Node* node) {
-        Node* curNode = node;
-        while(curNode->left) {
-            curNode = curNode->left;
-        }
-        
-        Node* finded_min = curNode; // 5
-        
-        curNode = node;
-        while(curNode->left) {
-            if (curNode->left->key == finded_min->key) {
-                break;
-            }
-            curNode = curNode->left;
-        }
-        
-        curNode->left = finded_min->right;
-        finded_min->left = nullptr;
-        finded_min->right = nullptr;
-        
-        return finded_min;
     }
     
     uint8_t height(Node* node) {
@@ -314,7 +336,7 @@ int run(std::istream& input, std::ostream& output) {
         } else {
             tree.erase(num * (-1));
         }
-        
+//        tree.print();
         output << tree.kth_position(kth) << "\n";
     }
     
@@ -322,31 +344,105 @@ int run(std::istream& input, std::ostream& output) {
 }
 
 void testLogic() {
-    AVLTree<int, int> tree;
-    
-    for (int i = 0; i < 100; i++) {
-        tree.insert(i, i);
+    {
+        std::stringstream sstr_input;
+        sstr_input << "5" << std::endl;
+        sstr_input << "10 0" << std::endl;
+        sstr_input << "11 0" << std::endl;
+        sstr_input << "12 0" << std::endl;
+        sstr_input << "-9 0" << std::endl;
+        sstr_input << "-11 0" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "10\n10\n10\n10\n10\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "3" << std::endl;
+        sstr_input << "1 0" << std::endl;
+        sstr_input << "2 0" << std::endl;
+        sstr_input << "-1 0" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "1\n1\n2\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "3" << std::endl;
+        sstr_input << "1 0" << std::endl;
+        sstr_input << "2 0" << std::endl;
+        sstr_input << "-2 0" << std::endl;
+
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "1\n1\n1\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "5" << std::endl;
+        sstr_input << "40 0" << std::endl;
+        sstr_input << "10 1" << std::endl;
+        sstr_input << "4 1" << std::endl;
+        sstr_input << "-10 0" << std::endl;
+        sstr_input << "50 2" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "40\n40\n10\n4\n50\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "9" << std::endl;
+        sstr_input << "1 0" << std::endl;
+        sstr_input << "2 0" << std::endl;
+        sstr_input << "3 0" << std::endl;
+        sstr_input << "4 0" << std::endl;
+        sstr_input << "5 0" << std::endl;
+        
+        sstr_input << "-4 0" << std::endl;
+        sstr_input << "-5 0" << std::endl;
+        sstr_input << "-1 0" << std::endl;
+        sstr_input << "-2 0" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "1\n1\n1\n1\n1\n1\n1\n2\n3\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "3" << std::endl;
+        sstr_input << "1 0" << std::endl;
+        sstr_input << "2 0" << std::endl;
+        sstr_input << "-2 0" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "1\n1\n1\n");
     }
     
-    for (int i = 0; i < 100; i++) {
-        assert(*tree.find(i) == i);
-        tree.erase(i);
-        assert(tree.find(i) == nullptr);
-    }
-    
-    for (int i = 0; i < 1000; i++) {
-        tree.insert(i, i);
-    }
+    std::cout << "TEST PASSED" << std::endl;
 }
 
 int main(int argc, const char * argv[]) {
-//    AVLTree<int, int> tree;
-//
-//    tree.insert(40, 40);
-//    tree.insert(10, 10);
-//    tree.insert(4, 4);
-//
-//    return 0;
+    AVLTree<int, int> tree;
+
+    tree.insert(10, 10);
+    tree.insert(20, 11);
+    tree.insert(30, 12);
+    tree.insert(40, 12);
+    tree.insert(50, 12);
+    tree.insert(60, 12);
+
+    tree.print();
+
+    tree.erase(40);
+
+    tree.print();
+
+    return 0;
     
+//    testLogic();
     return run(std::cin, std::cout);
 }
