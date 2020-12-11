@@ -83,6 +83,7 @@ public:
         queue.push(cur);
         queue.push(SEP);
         
+        std::cout << std::endl;
         while(!queue.empty()) {
             Node* poped = queue.front();
             queue.pop();
@@ -106,6 +107,34 @@ public:
     int min_depth() {
         if (!root) return 0;
         return min_depth_aux(root);
+    }
+    
+    bool check_ordering() {
+        Node* cur = root;
+        std::queue<Node*> queue;
+        
+        if (!cur) return true;
+        
+        queue.push(cur);
+        
+        while(!queue.empty()) {
+            Node* poped = queue.front();
+            queue.pop();
+            
+            if (poped->left) {
+                if (poped->left->key >= poped->key) {
+                    return false;
+                }
+                queue.push(poped->left);
+            }
+            if (poped->right) {
+                if (poped->right->key < poped->key) {
+                    return false;
+                }
+                queue.push(poped->right);
+            }
+        }
+        return true;
     }
     
 private:
@@ -170,69 +199,34 @@ private:
             Node* left = node->left;
             Node* right = node->right;
             
-            delete node;
-            
             if (right == nullptr) {
+                delete node;
                 return left;
-            }
-            
-            if (!right->left && !right->right) {
+            } else if (!right->left && !right->right) {
                 right->left = left;
+                delete node;
                 return balance(right);
+            } else {
+                Node* tmp;
+                node->right = find_and_remove_min(right, tmp);
+                node->value = tmp->value;
+                node->key = tmp->key;
+                delete tmp;
+                
+                return balance(node);
             }
-            
-            Node* min_node = find_and_remove_min(right);
-            min_node->right = right;
-            min_node->left = left;
-            
-//            Node* min_node = find_min(right);
-//            min_node->right = remove_min(right);
-//            min_node->left = left;
-            
-            return balance(min_node);
         }
         
         return balance(node);
     }
     
-    Node* find_and_remove_min(Node* node) {
-        Node* minNode = node;
-        while(minNode->left) {
-            minNode = minNode->left;
+    Node* find_and_remove_min(Node* node, Node*& min_node) {
+        if (!node->left) {
+            min_node = node;
+            return node->right;
         }
-        
-        Node* finded_min = minNode; // 5
-        
-        Node* prev = node;
-        minNode = node->left;
-        
-        if (minNode) {
-            while(minNode->left) {
-                prev = minNode;
-                balance(minNode);
-                minNode = minNode->left;
-                
-            }
-        }
-        
-        
-        if (minNode && minNode->right) {
-            prev->left = minNode->right;
-            finded_min->right = node;
-        }
-        
-        if (minNode && minNode->right == nullptr) {
-            prev->left = nullptr;
-            finded_min->right = node;
-        }
-//        if (!minNode) {
-//            finded_min->right = nullptr;
-//        }
-//        finded_min->left = node->left;
-        
-//        finded_min->right = minNode->right;
-        
-        return finded_min;
+        node->left = find_and_remove_min(node->left, min_node);
+        return balance(node);
     }
     
     Node* find_min(Node* node) {
@@ -422,27 +416,26 @@ void testLogic() {
         assert(sstr_output.str() == "1\n1\n1\n");
     }
     
+    {
+        std::stringstream sstr_input;
+        sstr_input << "7" << std::endl;
+        sstr_input << "10 0" << std::endl;
+        sstr_input << "20 1" << std::endl;
+        sstr_input << "30 2" << std::endl;
+        sstr_input << "40 3" << std::endl;
+        sstr_input << "50 4" << std::endl;
+        sstr_input << "60 5" << std::endl;
+        sstr_input << "-40 3" << std::endl;
+        
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "10\n20\n30\n40\n50\n60\n50\n");
+    }
+    
     std::cout << "TEST PASSED" << std::endl;
 }
 
 int main(int argc, const char * argv[]) {
-    AVLTree<int, int> tree;
-
-    tree.insert(10, 10);
-    tree.insert(20, 11);
-    tree.insert(30, 12);
-    tree.insert(40, 12);
-    tree.insert(50, 12);
-    tree.insert(60, 12);
-
-    tree.print();
-
-    tree.erase(40);
-
-    tree.print();
-
-    return 0;
-    
 //    testLogic();
     return run(std::cin, std::cout);
 }
