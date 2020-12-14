@@ -73,7 +73,31 @@ public:
     
     void add(Key key, Value value) {
         Node* newNode = new Node(key, value);
-        root = add_aux(root, newNode);
+        
+        if (!root) {
+            root = newNode;
+            return;
+        }
+        
+        Node* curNode = root;
+        
+        while(curNode) {
+            if (newNode->key < curNode->key) {
+                if (curNode->left) {
+                    curNode = curNode->left;
+                } else {
+                    curNode->left = newNode;
+                    break;
+                }
+            } else {
+                if (curNode->right) {
+                    curNode = curNode->right;
+                } else {
+                    curNode->right = newNode;
+                    break;
+                }
+            }
+        }
     }
     
     int count_leaves() {
@@ -110,20 +134,6 @@ private:
     Node* root;
     size_t count_nodes;
     Comparator comp;
-    
-    Node* add_aux(Node* node, Node* newNode) {
-        if (!node) {
-            return newNode;
-        }
-        
-        if (newNode->key < node->key) {
-            node->left = add_aux(node->left, newNode);
-        } else {
-            node->right = add_aux(node->right, newNode);
-        }
-        
-        return node;
-    }
 };
 
 
