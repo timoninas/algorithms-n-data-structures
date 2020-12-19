@@ -28,3 +28,11 @@ ____
 | :two: | Бинарное дерево. Вывод элементов в порядке in-order | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_2/task_2_1/main.cpp) |
 | :four: | Декартово дерево. Обход в ширину | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_2/task_3_2/main.cpp) |
 | :four: | Сбалансированное дерево. AVL Tree | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_2/task_4_2/main.cpp) |
+
+____
+
+### Модуль 3
+
+| :1234: | Описание | Код |
+| --- | --- | --- |
+| :one: | Виды представления графов | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_1/main.cpp) |
