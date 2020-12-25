@@ -1,10 +1,3 @@
-//
-//  ArcGraph.hpp
-//  task_1
-//
-//  Created by Антон Тимонин on 25.12.2020.
-//
-
 #ifndef ArcGraph_hpp
 #define ArcGraph_hpp
 

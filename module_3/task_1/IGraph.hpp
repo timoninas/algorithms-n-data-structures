@@ -1,10 +1,3 @@
-//
-//  IGraph.hpp
-//  task_1
-//
-//  Created by Антон Тимонин on 22.12.2020.
-//
-
 #ifndef IGraph_hpp
 #define IGraph_hpp
 

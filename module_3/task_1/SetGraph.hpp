@@ -1,10 +1,3 @@
-//
-//  SetGraph.hpp
-//  task_1
-//
-//  Created by Антон Тимонин on 25.12.2020.
-//
-
 #ifndef SetGraph_hpp
 #define SetGraph_hpp
 
