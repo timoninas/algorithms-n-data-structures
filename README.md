@@ -33,6 +33,9 @@ ____
 
 ### Модуль 3
 
+
+
 | :1234: | Описание | Код |
 | --- | --- | --- |
 | :one: | Виды представления графов | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_1/main.cpp) |
+| :two: | Количество различных кратчайших путей | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_2/main.cpp) |
