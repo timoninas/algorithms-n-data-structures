@@ -1,36 +1,37 @@
-#include "ListGraph.hpp"
+#include "SetGraph.hpp"
 
-ListGraph::ListGraph(const IGraph& sendedGraph) {
+SetGraph::SetGraph(const IGraph& sendedGraph) {
     graph.resize(sendedGraph.VerticesCount());
     for (int i = 0; i < sendedGraph.VerticesCount(); i++) {
         for (auto child: sendedGraph.GetNextVertices(i)) {
-            graph[i].push_back(child);
+            graph[i].insert(child);
         }
     }
 }
 
-int ListGraph::VerticesCount() const {
+int SetGraph::VerticesCount() const {
     return graph.size();
 }
 
-void ListGraph::AddEdge(int from, int to) {
+void SetGraph::AddEdge(int from, int to) {
     assert(from < graph.size());
     assert(to < graph.size());
     assert(from >= 0);
     assert(to >= 0);
-    graph[from].push_back(to);
+    graph[from].insert(to);
 }
 
-std::vector<int> ListGraph::GetNextVertices(int vertex) const {
+std::vector<int> SetGraph::GetNextVertices(int vertex) const {
     std::vector<int> result;
     
-    result.resize(graph[vertex].size());
-    std::copy(graph[vertex].begin(), graph[vertex].end(), result.begin());
+    for (auto val: graph[vertex]) {
+        result.push_back(val);
+    }
     
     return result;
 }
 
-std::vector<int> ListGraph::GetPrevVertices(int vertex) const {
+std::vector<int> SetGraph::GetPrevVertices(int vertex) const {
     std::vector<int> result;
     
     for(size_t i = 0; i < graph.size(); i++) {

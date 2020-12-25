@@ -10,7 +10,6 @@
 // Для каждого класса создавайте отдельные h и cpp файлы.
 // Число вершин графа задается в конструкторе каждой реализации.
 
-
 // Создаем ListGraph
 // Из ListGraph создаем MatrixGraph
 // Из MatrixGraph создаем SetGraph
@@ -18,17 +17,12 @@
 // На каждом этапе проверять, что список детей совпадает
 
 #include "ListGraph.hpp"
+#include "MatrixGraph.hpp"
+#include "SetGraph.hpp"
+#include "ArcGraph.hpp"
 
-void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited, void (*callback)(int v)) {
-    visited[vertex] = true;
-    callback(vertex);
-    
-    for (auto child: graph.GetNextVertices(vertex)) {
-        if (!visited[child]) {
-            dfs_aux(graph, child, visited, callback);
-        }
-    }
-}
+// Depth First Search
+void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited, void (*callback)(int v));
 
 void dfs(const IGraph& graph, void (*callback)(int v)) {
     std::vector<bool> visited;
@@ -41,6 +35,18 @@ void dfs(const IGraph& graph, void (*callback)(int v)) {
     }
 }
 
+void dfs_aux(const IGraph& graph, int vertex, std::vector<bool>& visited, void (*callback)(int v)) {
+    visited[vertex] = true;
+    callback(vertex);
+    
+    for (auto child: graph.GetNextVertices(vertex)) {
+        if (!visited[child]) {
+            dfs_aux(graph, child, visited, callback);
+        }
+    }
+}
+
+// Breadth First Search
 void bfs(const IGraph& graph, void (*callback)(int v)) {
     std::vector<bool> visited;
     std::queue<int> queue;
@@ -65,16 +71,40 @@ void bfs(const IGraph& graph, void (*callback)(int v)) {
 }
 
 int main(int argc, const char * argv[]) {
-    ListGraph graph(6);
+    ListGraph listGraph(6);
+
+    listGraph.AddEdge(0, 1);
+    listGraph.AddEdge(1, 2);
+    listGraph.AddEdge(1, 5);
+    listGraph.AddEdge(2, 3);
+    listGraph.AddEdge(3, 4);
+    listGraph.AddEdge(4, 1);
+
+    bfs(listGraph, [](int v) {
+        std::cout << v << std::endl;
+    });
+
+    std::cout << "------------" << std::endl;
+
+    MatrixGraph mtrxGraph(listGraph);
+
+    bfs(mtrxGraph, [](int v) {
+        std::cout << v << std::endl;
+    });
     
-    graph.AddEdge(0, 1);
-    graph.AddEdge(1, 2);
-    graph.AddEdge(1, 5);
-    graph.AddEdge(2, 3);
-    graph.AddEdge(3, 4);
-    graph.AddEdge(4, 1);
+    std::cout << "------------" << std::endl;
+
+    SetGraph setGraph(mtrxGraph);
+
+    bfs(setGraph, [](int v) {
+        std::cout << v << std::endl;
+    });
     
-    bfs(graph, [](int v) {
+    std::cout << "------------" << std::endl;
+
+    ArcGraph arcGraph(setGraph);
+
+    bfs(arcGraph, [](int v) {
         std::cout << v << std::endl;
     });
     

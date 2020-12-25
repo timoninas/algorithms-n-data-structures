@@ -1,24 +1,24 @@
 //
-//  ListGraph.hpp
+//  SetGraph.hpp
 //  task_1
 //
-//  Created by Антон Тимонин on 22.12.2020.
+//  Created by Антон Тимонин on 25.12.2020.
 //
 
-#ifndef ListGraph_hpp
-#define ListGraph_hpp
+#ifndef SetGraph_hpp
+#define SetGraph_hpp
 
 #include "IGraph.hpp"
 
-class ListGraph: public IGraph {
+class SetGraph: public IGraph {
 public:
-    ListGraph(size_t verticesCount) {
+    SetGraph(size_t verticesCount) {
         graph.resize(verticesCount);
     }
     
-    ListGraph(const IGraph&);
+    SetGraph(const IGraph&);
     
-    virtual ~ListGraph() {}
+    virtual ~SetGraph() {}
     
     int VerticesCount() const override;
     
@@ -29,7 +29,7 @@ public:
     std::vector<int> GetPrevVertices(int vertex) const override;
     
 private:
-    std::vector < std::vector<int> > graph;
+    std::vector< std::unordered_set<int> > graph;
 };
 
-#endif /* ListGraph_hpp */
+#endif /* SetGraph_hpp */
