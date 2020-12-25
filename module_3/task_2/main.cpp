@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <vector>
+#include <queue>
 
 // Дан невзвешенный неориентированный граф. В графе может быть несколько
 // кратчайших путей между какими-то вершинами. Найдите количество
@@ -75,18 +76,69 @@ private:
     std::vector < std::vector<int> > graph;
 };
 
-int main(int argc, const char * argv[]) {
-    ListGraph listGraph(6);
-
-    listGraph.AddEdge(0, 1);
-    listGraph.AddEdge(1, 2);
-    listGraph.AddEdge(1, 5);
-    listGraph.AddEdge(2, 3);
-    listGraph.AddEdge(3, 4);
-    listGraph.AddEdge(4, 1);
-
-    for (auto val: listGraph.GetNextVertices(0)) {
-        std::cout << val << std::endl;
+void bfs(const IGraph& graph, int from, int to) {
+    std::queue<int> queue;
+    
+    std::vector<bool> visited;
+    visited.resize(graph.VerticesCount(), false);
+    
+    std::vector<int> routes;
+    routes.resize(graph.VerticesCount(), 0);
+    
+    std::vector<int> min_routes;
+    min_routes.resize(graph.VerticesCount(), 0);
+    
+    queue.push(from);
+    visited[from] = true;
+    routes[from] = 1;
+    min_routes[from] = 1;
+    while (!queue.empty()) {
+        int vertex = queue.front();
+        queue.pop();
+        std::cout << vertex << std::endl;
+        for (auto child: graph.GetNextVertices(vertex)) {
+            if (min_routes[child] == 0) {
+                min_routes[child] = min_routes[vertex];
+                routes[child] += routes[vertex];
+            } else if (min_routes[vertex] > min_routes[child]) {
+                min_routes[child] = min_routes[vertex];
+                routes[child] = routes[vertex];
+            } else if (min_routes[vertex] == min_routes[child]) {
+                routes[child] += routes[vertex];
+                std::cout << ">" << routes[vertex] << std::endl;
+            }
+//            routes[child] += routes[vertex];
+            if (!visited[child]) {
+                queue.push(child);
+                visited[child] = true;
+            }
+        }
     }
+    
+    for (int i = 0; i < graph.VerticesCount(); i++) {
+        std::cout << i << " - " << routes[i] << std::endl;
+    }
+}
+
+int main(int argc, const char * argv[]) {
+    ListGraph graph(7);
+    
+//    graph.AddEdge(0, 1);
+//    graph.AddEdge(0, 2);
+//    graph.AddEdge(1, 3);
+//    graph.AddEdge(2, 3);
+//    graph.AddEdge(3, 4);
+//    graph.AddEdge(3, 5);
+//    graph.AddEdge(4, 6);
+//    graph.AddEdge(5, 6);
+    
+    graph.AddEdge(0, 1);
+    graph.AddEdge(0, 2);
+    graph.AddEdge(1, 2);
+    graph.AddEdge(1, 3);
+    graph.AddEdge(2, 3);
+    
+    bfs(graph, 0, 3);
+    
     return 0;
 }
