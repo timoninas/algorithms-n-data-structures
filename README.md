@@ -35,4 +35,4 @@ ____
 
 | :1234: | Описание | Код |
 | --- | --- | --- |
-| :one: | Виды представления графов | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_1/main.cpp) |
+| :one: | Способы представления графов | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_1/main.cpp) |
