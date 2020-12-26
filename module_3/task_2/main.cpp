@@ -1,4 +1,6 @@
 #include <iostream>
+#include <istream>
+#include <sstream>
 
 #include <vector>
 #include <queue>
@@ -76,38 +78,34 @@ private:
     std::vector < std::vector<int> > graph;
 };
 
-void bfs(const IGraph& graph, int from, int to) {
+int bfs(const IGraph& graph, int from, int to) {
     std::queue<int> queue;
     
     std::vector<bool> visited;
     visited.resize(graph.VerticesCount(), false);
     
     std::vector<int> routes;
-    routes.resize(graph.VerticesCount(), 0);
+    routes.resize(graph.VerticesCount(), INT_MAX);
     
     std::vector<int> min_routes;
     min_routes.resize(graph.VerticesCount(), 0);
     
     queue.push(from);
     visited[from] = true;
-    routes[from] = 1;
+    routes[from] = 0;
     min_routes[from] = 1;
+    
     while (!queue.empty()) {
-        int vertex = queue.front();
-        queue.pop();
-        std::cout << vertex << std::endl;
+        int vertex = queue.front(); queue.pop();
+        
         for (auto child: graph.GetNextVertices(vertex)) {
-            if (min_routes[child] == 0) {
+            if (routes[child] > routes[vertex] + 1) {
                 min_routes[child] = min_routes[vertex];
-                routes[child] += routes[vertex];
-            } else if (min_routes[vertex] > min_routes[child]) {
-                min_routes[child] = min_routes[vertex];
-                routes[child] = routes[vertex];
-            } else if (min_routes[vertex] == min_routes[child]) {
-                routes[child] += routes[vertex];
-                std::cout << ">" << routes[vertex] << std::endl;
+                routes[child] = routes[vertex] + 1;
+            } else if (routes[child] == routes[vertex] + 1) {
+                min_routes[child] += min_routes[vertex];
             }
-//            routes[child] += routes[vertex];
+            
             if (!visited[child]) {
                 queue.push(child);
                 visited[child] = true;
@@ -115,30 +113,71 @@ void bfs(const IGraph& graph, int from, int to) {
         }
     }
     
-    for (int i = 0; i < graph.VerticesCount(); i++) {
-        std::cout << i << " - " << routes[i] << std::endl;
+    return min_routes[to];
+}
+
+int run(std::istream& input, std::ostream& output);
+
+void testLogic() {
+    {
+        std::stringstream sstr_input;
+        sstr_input << "4" << std::endl;
+        sstr_input << "5" << std::endl;
+        sstr_input << "0 1" << std::endl;
+        sstr_input << "0 2" << std::endl;
+        sstr_input << "1 2" << std::endl;
+        sstr_input << "1 3" << std::endl;
+        sstr_input << "2 3" << std::endl;
+        
+        sstr_input << "0 3" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "2\n");
+    }
+    {
+        std::stringstream sstr_input;
+        sstr_input << "7" << std::endl;
+        sstr_input << "8" << std::endl;
+        sstr_input << "0 1" << std::endl;
+        sstr_input << "0 2" << std::endl;
+        sstr_input << "1 3" << std::endl;
+        sstr_input << "2 3" << std::endl;
+        sstr_input << "3 4" << std::endl;
+        sstr_input << "3 5" << std::endl;
+        sstr_input << "4 6" << std::endl;
+        sstr_input << "5 6" << std::endl;
+        
+        sstr_input << "0 6" << std::endl;
+        std::stringstream sstr_output;
+        run(sstr_input, sstr_output);
+        assert(sstr_output.str() == "4\n");
     }
 }
 
-int main(int argc, const char * argv[]) {
-    ListGraph graph(7);
+int run(std::istream& input, std::ostream& output) {
+    int v, n;
+    input >> v >> n;
     
-//    graph.AddEdge(0, 1);
-//    graph.AddEdge(0, 2);
-//    graph.AddEdge(1, 3);
-//    graph.AddEdge(2, 3);
-//    graph.AddEdge(3, 4);
-//    graph.AddEdge(3, 5);
-//    graph.AddEdge(4, 6);
-//    graph.AddEdge(5, 6);
+    ListGraph graph(v);
     
-    graph.AddEdge(0, 1);
-    graph.AddEdge(0, 2);
-    graph.AddEdge(1, 2);
-    graph.AddEdge(1, 3);
-    graph.AddEdge(2, 3);
+    for (int i = 0; i < n; i++) {
+        int v1, v2;
+        input >> v1 >> v2;
+        graph.AddEdge(v1, v2);
+    }
     
-    bfs(graph, 0, 3);
+    int from, to;
+    input >> from >> to;
+    
+    output << bfs(graph, from, to) << "\n";
     
     return 0;
+}
+
+int main(int argc, const char * argv[]) {
+    testLogic();
+    std::cout << "TEST PASSED" << std::endl;
+    return 0;
+    
+//    return run(std::cin, std::cout);
 }
