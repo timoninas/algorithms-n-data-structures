@@ -37,4 +37,4 @@ ____
 | --- | --- | --- |
 | :one: | Виды представления графов | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_1/main.cpp) |
 | :two: | Количество различных кратчайших путей | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_2/main.cpp) |
-| :two: | Алгоритм Дейсктры | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_3/main.cpp) |
+| :three: | Алгоритм Дейсктры | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/task_3/main.cpp) |
