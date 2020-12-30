@@ -44,3 +44,4 @@ ____
 | :1234: | Описание | Код |
 | --- | --- | --- |
 | :one: | Количество компонент связанности | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/rk_task_2/main.cpp) |
+| :two: | Эйлеров граф | [Код](https://github.com/timoninas/algorithms-n-data-structures/blob/master/module_3/rk_task_3/main.cpp) |
