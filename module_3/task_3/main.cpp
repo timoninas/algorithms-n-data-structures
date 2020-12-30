@@ -12,6 +12,12 @@
 
 // Требуется отыскать самый выгодный маршрут между городами
 
+struct cmp {
+    bool operator() (const std::pair<int, int> &a, const std::pair<int, int> &b) {
+        return a.second <= b.second;
+    }
+};
+
 struct IGraph {
     virtual ~IGraph() {}
     
@@ -75,27 +81,21 @@ int Dijkstra(const IGraph& graph, int from, int to) {
     std::vector<int> dist; dist.resize(graph.VerticesCount(), MAX_INT);
     dist[from] = 0;
     
-    std::set< int > q; q.insert(from);
+    std::set< std::pair<int, int>, cmp > q; q.insert(std::make_pair(from, 0));
     
     while(!q.empty()) {
-        auto u = *q.begin(); q.erase(q.begin());
+        auto u = (*q.begin()).first; q.erase(q.begin());
         for (auto vt: graph.GetNextVertices(u)) {
             if (dist[vt.first] > dist[u] + vt.second) {
                 dist[vt.first] = dist[u] + vt.second;
                 parents[vt.first] = u;
-                q.insert(vt.first);
+                q.insert(std::make_pair(vt.first, dist[vt.first]));
             }
         }
     }
     
     return dist[to];
 }
-
-struct cmp {
-    bool operator() (const std::pair<int, int> &a, const std::pair<int, int> &b) {
-        return a.first == b.first && a.second < b.second;
-    }
-};
 
 int run(std::istream& input, std::ostream& output);
 
